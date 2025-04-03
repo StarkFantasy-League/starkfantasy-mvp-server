@@ -1,26 +1,25 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, OneToOne, JoinColumn, PrimaryColumn, Generated } from 'typeorm';
 
 @Entity()
 export class CricketTeam {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryColumn()
+  id: string;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @OneToMany(() => CricketPlayer, player => player.team)
-    players: CricketPlayer[];
+  @OneToMany(() => CricketPlayer, player => player.team)
+  players: CricketPlayer[];
 
-    constructor(id: string, name: string) {
-        this.id = id;
-        this.name = name;
-        this.players = [];
-    }
+  constructor(id: string, name: string) {
+    this.id = id;
+    this.name = name;
+  }
 }
 
 @Entity()
 export class CricketPlayer {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn()
     id: string;
 
     @Column()
@@ -54,13 +53,12 @@ export class CricketPlayer {
         this.firstName = firstName;
         this.lastName = lastName;
         this.position = position;
-        this.performances = [];
     }
 }
 
 @Entity()
 export class CricketMatch {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn()
     id: string;
 
     @Column()
@@ -70,7 +68,7 @@ export class CricketMatch {
     awayTeamId: string;
 
     @Column({ type: 'datetime' })
-    dateTime: Date;
+    matchDate: Date;
 
     @ManyToOne(() => CricketTeam)
     @JoinColumn({ name: 'homeTeamId' })
@@ -80,8 +78,8 @@ export class CricketMatch {
     @JoinColumn({ name: 'awayTeamId' })
     awayTeam: CricketTeam;
 
-    @OneToOne(() => Pool, pool => pool.match)
-    pool: Pool | null;
+    @OneToOne(() => CricketPool, pool => pool.match)
+    pool: CricketPool | null;
 
     @OneToMany(() => PlayerPerformance, performance => performance.match)
     performances: PlayerPerformance[];
@@ -90,19 +88,20 @@ export class CricketMatch {
         id: string,
         homeTeamId: string,
         awayTeamId: string,
-        dateTime: Date
+        matchDate: Date
     ) {
         this.id = id;
         this.homeTeamId = homeTeamId;
         this.awayTeamId = awayTeamId;
-        this.dateTime = dateTime;
+        this.matchDate = matchDate;
         this.pool = null;
     }
 }
 
 @Entity()
-export class Pool {
-    @PrimaryGeneratedColumn('uuid')
+export class CricketPool {
+    @PrimaryColumn()
+    @Generated('uuid')
     id: string;
 
     @Column()
@@ -120,7 +119,8 @@ export class Pool {
 
 @Entity()
 export class PlayerPerformance {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn()
+    @Generated('uuid')
     id: string;
 
     @Column()
