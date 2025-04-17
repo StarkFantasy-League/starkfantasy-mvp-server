@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, ConflictException } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { InjectRepository } from '@nestjs/typeorm';
 import { CricketPlayer } from "src/schema";
@@ -10,9 +10,15 @@ export class CricketPlayerRepository{
         private readonly repo: Repository<CricketPlayer>,
      ) {}
 
-     create(player: CricketPlayer){
-        return this.repo.insert(player);
-     }
+  async create(player: CricketPlayer) {
+    const existing = await this.repo.findOne({ where: { id: player.id } });
+    if (existing) {
+      throw new ConflictException('The player ID already exists');
+    }
+
+    return this.repo.save(player);
+  }
+
 
      findAll (){
         return this.repo.find();

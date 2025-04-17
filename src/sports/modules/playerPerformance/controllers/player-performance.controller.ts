@@ -21,6 +21,10 @@ findAll(){
 findOne(@Param ('id') id:string){
     return this.poolService.findOne(id);
 }
+@Get ('player/:playerId')
+findPlayer(@Param ('playerId') id:string){
+    return this.poolService.findByPlayerId(id);
+}
 
 @Delete (':id')
 delete (@Param('id') id:string){

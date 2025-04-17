@@ -9,5 +9,6 @@ import { CrickerMatchController } from './controllers/match.controller';
   imports: [TypeOrmModule.forFeature([CricketMatch])],
   controllers: [CrickerMatchController],
   providers: [CricketMatchRepository, CricketMatchService],
+    exports: [CricketMatchService], 
 })
 export class CricketMatchModule {}

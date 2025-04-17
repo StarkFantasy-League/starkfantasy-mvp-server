@@ -9,5 +9,6 @@ import { PlayerPerformance } from 'src/schema';
   imports: [TypeOrmModule.forFeature([PlayerPerformance])],
   controllers: [PlayerPerformanceController],
   providers: [PlayerPerformanceRepository, PlayerPerformanceService],
+      exports: [PlayerPerformanceService], 
 })
 export class PlayerPerformanceModule {}

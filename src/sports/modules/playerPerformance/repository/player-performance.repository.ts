@@ -23,4 +23,11 @@ export class PlayerPerformanceRepository{
      findOne(id: string){
         return this.repo.findOne({where: {id}});
      }
+
+     async findByPlayerId(playerId: string): Promise<PlayerPerformance[]> {
+      return this.repo.find({
+        where: { cricketPlayerId: playerId },
+      });
+    }
+    
 }
