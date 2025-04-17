@@ -8,12 +8,16 @@ export class CricketTeam {
   @Column()
   name: string;
 
+  @Column()
+  image_path: string;
+
   @OneToMany(() => CricketPlayer, player => player.team)
   players: CricketPlayer[];
 
-  constructor(id: string, name: string) {
+  constructor(id: string, name: string, image_path: string) {
     this.id = id;
     this.name = name;
+    this.image_path=image_path;
   }
 }
 
@@ -38,6 +42,9 @@ export class CricketPlayer {
     @JoinColumn({ name: 'teamId' })
     team: CricketTeam;
 
+    @Column()
+    image_path: string;
+
     @OneToMany(() => PlayerPerformance, performance => performance.player)
     performances: PlayerPerformance[];
 
@@ -46,13 +53,15 @@ export class CricketPlayer {
         teamId: string,
         firstName: string,
         lastName: string,
-        position: string
+        position: string,
+        image_path: string
     ) {
         this.id = id;
         this.teamId = teamId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.position = position;
+        this.image_path=image_path
     }
 }
 
@@ -122,43 +131,42 @@ export class PlayerPerformance {
     @PrimaryColumn()
     @Generated('uuid')
     id: string;
-
+  
     @Column()
     cricketMatchId: string;
-
+  
     @Column()
     cricketPlayerId: string;
-
+  
     @Column()
     runs: number;
-
+  
     @Column()
     wickets: number;
-
+  
     @Column()
     catches: number;
-
+  
     @ManyToOne(() => CricketMatch, match => match.performances)
     @JoinColumn({ name: 'cricketMatchId' })
     match: CricketMatch;
-
+  
     @ManyToOne(() => CricketPlayer, player => player.performances)
     @JoinColumn({ name: 'cricketPlayerId' })
     player: CricketPlayer;
-
+  
     constructor(
-        id: string,
-        cricketMatchId: string,
-        cricketPlayerId: string,
-        runs: number = 0,
-        wickets: number = 0,
-        catches: number = 0
+      cricketMatchId: string,
+      cricketPlayerId: string,
+      runs: number = 0,
+      wickets: number = 0,
+      catches: number = 0
     ) {
-        this.id = id;
-        this.cricketMatchId = cricketMatchId;
-        this.cricketPlayerId = cricketPlayerId;
-        this.runs = runs;
-        this.wickets = wickets;
-        this.catches = catches;
+      this.cricketMatchId = cricketMatchId;
+      this.cricketPlayerId = cricketPlayerId;
+      this.runs = runs;
+      this.wickets = wickets;
+      this.catches = catches;
     }
+    
 }

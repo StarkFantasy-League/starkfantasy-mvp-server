@@ -7,7 +7,7 @@ export class PlayerPerformanceService {
   constructor(private readonly playerPerformanceRepo: PlayerPerformanceRepository) {}
 
   async create(entity: PlayerPerformance) {
-    const team = new PlayerPerformance(entity.id, entity.cricketMatchId,entity.cricketPlayerId,entity.runs,entity.wickets,entity.catches);
+    const team = new PlayerPerformance(entity.cricketMatchId,entity.cricketPlayerId,entity.runs,entity.wickets,entity.catches);
     try {
       return await this.playerPerformanceRepo.create(team);
     } catch (error) {
@@ -37,4 +37,15 @@ export class PlayerPerformanceService {
     }
     await this.playerPerformanceRepo.delete(id);
   }
+
+  async findByPlayerId(playerId: string): Promise<PlayerPerformance[]> {
+    const performances = await this.playerPerformanceRepo.findByPlayerId(playerId);
+  
+    if (!performances || performances.length === 0) {
+      throw new NotFoundException(`No performances found for player ID: ${playerId}`);
+    }
+  
+    return performances;
+  }
+  
 }

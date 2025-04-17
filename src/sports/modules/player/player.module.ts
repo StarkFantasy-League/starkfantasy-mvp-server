@@ -9,5 +9,6 @@ import { CricketPlayerService } from './service/player.service';
   imports: [TypeOrmModule.forFeature([CricketPlayer])],
   controllers: [CricketPlayerController],
   providers: [CricketPlayerRepository, CricketPlayerService],
+  exports: [CricketPlayerService], 
 })
 export class CricketPlayerModule {}
