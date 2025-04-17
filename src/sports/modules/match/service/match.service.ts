@@ -27,6 +27,10 @@ export class CricketMatchService {
     return this.matchRepo.findAll();
   }
 
+   findByWeek (){
+    return this.matchRepo.findByWeekRange();
+   }
+   
   async findOne(id: string) {
     const match = await this.matchRepo.findOne(id);
     if (!match) {
