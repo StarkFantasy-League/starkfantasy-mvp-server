@@ -17,6 +17,13 @@ findAll(){
     return this.matchService.findAll();
 }
 
+
+@Get('/week-matchs')
+findByWeek(){
+    return this.matchService.findByWeek();
+}
+
+
 @Get (':id')
 findOne(@Param ('id') id:string){
     return this.matchService.findOne(id);
