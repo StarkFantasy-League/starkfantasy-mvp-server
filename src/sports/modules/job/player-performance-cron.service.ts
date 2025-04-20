@@ -38,7 +38,7 @@ export class TaskPlayerPerformance {
      return filteredMatches; 
     }   
 
-    @Cron('0 46 19 * * 1') // Lunes a las 19:46 (7:46 PM)
+    @Cron('0 46 19 * * 1') // Lunes a las 19:46 (7:46 PM) 
 async getPlayerPerformancesForWeek() {
     const matches = await this.getMatchesFromLastWeek();
     this.logger.log(`🗂️ Se encontraron ${matches.length} partidos para el resumen semanal`);

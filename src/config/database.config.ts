@@ -1,5 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { CricketMatch, CricketPlayer, CricketPool, CricketTeam, PlayerPerformance } from 'src/schema';
+import { CricketMatch, CricketPlayer, CricketPool, CricketTeam, PlayerPerformance, BetsOptions, SpecialBet } from 'src/schema';
 
 export const databaseConfig: TypeOrmModuleOptions = {
   type: 'mssql',
@@ -12,6 +12,6 @@ export const databaseConfig: TypeOrmModuleOptions = {
     encrypt: false,
     trustServerCertificate: true,
   },
-  entities: [CricketMatch, CricketTeam, CricketPool, PlayerPerformance, CricketPlayer],
-  synchronize: true, 
+  entities: [CricketMatch, CricketTeam, CricketPool, PlayerPerformance, CricketPlayer, BetsOptions, SpecialBet],
+  synchronize: false, 
 };

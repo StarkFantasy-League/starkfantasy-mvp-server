@@ -169,4 +169,54 @@ export class PlayerPerformance {
       this.catches = catches;
     }
     
+
+    
+}
+
+
+@Entity()
+export class BetsOptions {
+    @PrimaryColumn()
+    @Generated('uuid')
+    id: string;
+  
+    @Column()
+    betName: string;
+  
+    constructor(
+        betName: string,
+    ) {
+      this.betName = betName;
+    }
+}
+
+@Entity('cricket_special_bet')
+export class SpecialBet {
+    @PrimaryColumn()
+    @Generated('uuid')
+    id: string;
+  
+    @Column()
+    specialBetId: string;
+  
+    @Column()
+    playerId: string;
+  
+  s
+  @ManyToOne(() => BetsOptions)
+  @JoinColumn({ name: 'specialBetId' })
+  specialBet: BetsOptions;
+
+  @ManyToOne(() => CricketPlayer)
+  @JoinColumn({ name: 'playerId' })
+  player: CricketPlayer;
+  
+    constructor(
+        specialBetId: string,
+        playerId: string,
+    ) {
+      this.specialBetId = specialBetId;
+      this.playerId = playerId;
+
+    }
 }

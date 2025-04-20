@@ -14,6 +14,7 @@ import { SportmonksModule } from './sports/modules/API/api.module';
 import { TaskPlayerService } from './sports/modules/job/player-cron.service';
 import { TaskMatchService } from './sports/modules/job/match-cron.service';
 import { TaskPlayerPerformance } from './sports/modules/job/player-performance-cron.service';
+import { SpecialBetModule } from './sports/modules/SpecialBets/special-bets.module';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -23,7 +24,8 @@ import { TaskPlayerPerformance } from './sports/modules/job/player-performance-c
     CricketPlayerModule,
     PlayerPerformanceModule,
     PoolModule,
-    SportmonksModule
+    SportmonksModule,
+    SpecialBetModule
   ],
   controllers: [AppController],
   providers: [AppService, TaskTeamService, TaskPlayerService, TaskMatchService, TaskPlayerPerformance],
