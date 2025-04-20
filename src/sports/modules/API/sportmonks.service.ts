@@ -26,7 +26,7 @@ export class SportmonksService {
     const url = `${this.baseUrl}/seasons/${seasonId}?api_token=${this.apiToken}&include=teams`;
     const response$ = this.httpService.get(url);
     const response = await lastValueFrom(response$);
-return response.data.data.teams.filter(team => team.code !== 'TBC');
+return response.data.data.teams;
 
   }
 

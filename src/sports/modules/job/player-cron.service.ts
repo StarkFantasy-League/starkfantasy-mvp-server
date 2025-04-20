@@ -12,7 +12,7 @@ export class TaskPlayerService {
     private readonly cricketPlayerService: CricketPlayerService) {}
 
 
-    
+
   @Cron('0 0 3 2 3 *') // 3:00 AM, 2 de marzo, cada año (Antes de comenzar la temporada)
   async UpdatePlayersBySeason() {
     try {
