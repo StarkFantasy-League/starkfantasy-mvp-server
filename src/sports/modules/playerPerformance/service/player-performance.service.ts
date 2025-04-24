@@ -7,7 +7,7 @@ export class PlayerPerformanceService {
   constructor(private readonly playerPerformanceRepo: PlayerPerformanceRepository) {}
 
   async create(entity: PlayerPerformance) {
-    const team = new PlayerPerformance(entity.cricketMatchId,entity.cricketPlayerId,entity.runs,entity.wickets,entity.catches);
+    const team = new PlayerPerformance(entity.cricketMatchId,entity.cricketPlayerId,entity.runs,entity.wickets,entity.catches,entity.points);
     try {
       return await this.playerPerformanceRepo.create(team);
     } catch (error) {

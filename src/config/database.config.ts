@@ -1,6 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
-import { CricketMatch, CricketPlayer, CricketPool, CricketTeam, PlayerPerformance, BetsOptions, SpecialBet } from 'src/schema';
+import { CricketMatch, CricketPlayer, CricketPool, CricketTeam, PlayerPerformance, BetsOptions, SpecialBet, CricketPlayerHistorial } from 'src/schema';
 
 export const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOptions => ({
   type: 'mssql',
@@ -13,6 +13,6 @@ export const getDatabaseConfig = (configService: ConfigService): TypeOrmModuleOp
     encrypt: false,
     trustServerCertificate: true,
   },
-  entities: [CricketMatch, CricketTeam, CricketPool, PlayerPerformance, CricketPlayer, BetsOptions, SpecialBet],
+  entities: [CricketMatch, CricketTeam, CricketPool, PlayerPerformance, CricketPlayer, BetsOptions, SpecialBet, CricketPlayerHistorial],
   synchronize: false,
 });

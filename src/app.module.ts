@@ -16,6 +16,8 @@ import { TaskPlayerService } from './sports/modules/job/player-cron.service';
 import { TaskMatchService } from './sports/modules/job/match-cron.service';
 import { TaskPlayerPerformance } from './sports/modules/job/player-performance-cron.service';
 import { SpecialBetModule } from './sports/modules/SpecialBets/special-bets.module';
+import { PlayerHistoryModule } from './sports/modules/PlayerHistorial/player-history.module';
+import { TaskPlayerHistory } from './sports/modules/job/player-history-cron.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -33,9 +35,10 @@ import { SpecialBetModule } from './sports/modules/SpecialBets/special-bets.modu
     PlayerPerformanceModule,
     PoolModule,
     SportmonksModule,
-    SpecialBetModule
+    SpecialBetModule,
+    PlayerHistoryModule
   ],
   controllers: [AppController],
-  providers: [AppService, TaskTeamService, TaskPlayerService, TaskMatchService, TaskPlayerPerformance],
+  providers: [AppService, TaskTeamService, TaskPlayerService, TaskMatchService, TaskPlayerPerformance, TaskPlayerHistory],
 })
 export class AppModule {}

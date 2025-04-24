@@ -146,6 +146,9 @@ export class PlayerPerformance {
   
     @Column()
     catches: number;
+
+    @Column()
+    points: number;
   
     @ManyToOne(() => CricketMatch, match => match.performances)
     @JoinColumn({ name: 'cricketMatchId' })
@@ -160,13 +163,15 @@ export class PlayerPerformance {
       cricketPlayerId: string,
       runs: number = 0,
       wickets: number = 0,
-      catches: number = 0
+      catches: number = 0,
+      points: number =0,
     ) {
       this.cricketMatchId = cricketMatchId;
       this.cricketPlayerId = cricketPlayerId;
       this.runs = runs;
       this.wickets = wickets;
       this.catches = catches;
+      this.points= points;
     }
     
 
@@ -219,4 +224,45 @@ export class SpecialBet {
       this.playerId = playerId;
 
     }
+}
+
+
+@Entity()
+export class CricketPlayerHistorial {
+  @PrimaryColumn()
+  @Generated('uuid')
+  id: string;
+
+  @Column()
+  playerId: string;
+
+  @Column()
+  runs: number;
+
+  @Column()
+  wickets: number;
+
+  @Column()
+  catches: number;
+
+  @Column()
+  points: number;
+
+  @ManyToOne(() => CricketPlayer)
+  @JoinColumn({ name: 'playerId' })
+  player: CricketPlayer;
+
+  constructor(
+    playerId: string,
+    runs: number = 0,
+    wickets: number = 0,
+    catches: number = 0,
+    points: number = 0
+  ) {
+    this.playerId = playerId;
+    this.runs = runs;
+    this.wickets = wickets;
+    this.catches = catches;
+    this.points = points;
+  }
 }
