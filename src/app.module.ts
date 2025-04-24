@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TaskTeamService } from './sports/modules/job/team-cron.service';
 import { CricketMatchModule } from './sports/modules/match/match.module';
-import { databaseConfig } from './config/database.config';
+import { getDatabaseConfig } from './config/database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CricketTeamModule } from './sports/modules/team/team.module';
 import { CricketPlayerModule } from './sports/modules/player/player.module';
@@ -17,8 +18,15 @@ import { TaskPlayerPerformance } from './sports/modules/job/player-performance-c
 import { SpecialBetModule } from './sports/modules/SpecialBets/special-bets.module';
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     ScheduleModule.forRoot(),
-    TypeOrmModule.forRoot(databaseConfig), 
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => getDatabaseConfig(configService),
+      inject: [ConfigService],
+    }),
     CricketMatchModule,
     CricketTeamModule,
     CricketPlayerModule,
