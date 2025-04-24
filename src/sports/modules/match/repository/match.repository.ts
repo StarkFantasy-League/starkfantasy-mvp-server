@@ -15,7 +15,9 @@ export class CricketMatchRepository {
   }
 
   findAll() {
-    return this.repo.find();
+    return this.repo.find({
+      relations: ['homeTeam', 'awayTeam']
+    });
   }
 
   delete(id: string) {
@@ -23,7 +25,10 @@ export class CricketMatchRepository {
   }
 
   findOne(id: string) {
-    return this.repo.findOne({ where: { id } });
+    return this.repo.findOne({ 
+      where: { id },
+      relations: ['homeTeam', 'awayTeam']
+    });
   }
 
   async findByWeekRange() {
@@ -32,7 +37,8 @@ export class CricketMatchRepository {
    return this.repo.find({
      where: {
        matchDate: Between(startDate, endDate) 
-     }
+     },
+     relations: ['homeTeam', 'awayTeam']
    });
  }
  
