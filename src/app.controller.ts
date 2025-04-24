@@ -14,4 +14,20 @@ export class AppController {
   async loadApiData() {
     return await this.appService.load();
   }
+
+  @Post('loadHistory')
+  async loadHistoryData() {
+    return await this.appService.loadHistory();
+  }
+
+  @Post('loadPerformances')
+  async loadPerformances() {
+    return await this.appService.loadPerformances();
+  }
+
+  @Post('deletePerformance')
+  async delete() {
+    return await this.appService.deletePerformances();
+  }
 }
+

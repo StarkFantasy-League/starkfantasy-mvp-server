@@ -15,7 +15,8 @@ export class PlayerHistoryRepository {
   }
 
   findAll() {
-    return this.repo.find();
+    return this.repo.find({    relations: ['player']});
+
   }
 
   delete(id: string) {

@@ -45,6 +45,7 @@ CREATE TABLE player_performance (
   runs INT,
   wickets INT,
   catches INT,
+  points INT,
   CONSTRAINT PK_PlayerPerfomanceID PRIMARY KEY (id),
   CONSTRAINT FK_PerfomanceMatch FOREIGN KEY (cricketMatchId) REFERENCES cricket_match(id),
   CONSTRAINT FK_PerfomancPlayer FOREIGN KEY (cricketPlayerId) REFERENCES cricket_player(id)
@@ -76,6 +77,17 @@ CREATE TABLE cricket_special_bet (
   CONSTRAINT PK_CricketSpecialBet PRIMARY KEY (id),
   CONSTRAINT FK_BetsOption FOREIGN KEY (specialBetId) REFERENCES bets_options(id),
   CONSTRAINT FK_playerBet FOREIGN KEY (playerId) REFERENCES cricket_player(id)
+);
+
+CREATE TABLE cricket_player_historial (
+  id VARCHAR(100) NOT NULL DEFAULT CAST(NEWID() AS VARCHAR(100)),
+  playerId  VARCHAR(100),
+    runs INT,
+  wickets INT,
+  catches INT,
+  points INT,
+  CONSTRAINT PK_CricketPlayerHistorial PRIMARY KEY (id),
+  CONSTRAINT FK_playerHistorial FOREIGN KEY (playerId) REFERENCES cricket_player(id)
 );
 
 

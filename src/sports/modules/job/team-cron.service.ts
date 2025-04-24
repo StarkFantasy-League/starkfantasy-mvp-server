@@ -13,7 +13,7 @@ export class TaskTeamService {
 
 
     
-  @Cron('0 0 3 1 3 *') // 3:00 AM, 1 de marzo, cada año (Antes de comenzar la temporada)
+ @Cron('0 0 3 1 3 *') // 3:00 AM, 1 de marzo, cada año (Antes de comenzar la temporada)
   async updateSeasonTeams() {
     try {
       const teams = await this.sportmonksService.getIPLTEams();
