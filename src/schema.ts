@@ -1,4 +1,14 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, OneToOne, JoinColumn, PrimaryColumn, Generated } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToOne,
+  OneToOne,
+  JoinColumn,
+  PrimaryColumn,
+  Generated,
+} from 'typeorm';
 
 @Entity()
 export class CricketTeam {
@@ -23,45 +33,45 @@ export class CricketTeam {
 
 @Entity()
 export class CricketPlayer {
-    @PrimaryColumn()
-    id: string;
+  @PrimaryColumn()
+  id: string;
 
-    @Column()
-    teamId: string;
+  @Column()
+  teamId: string;
 
-    @Column()
-    firstName: string;
+  @Column()
+  firstName: string;
 
-    @Column()
-    lastName: string;
+  @Column()
+  lastName: string;
 
-    @Column()
-    position: string;
+  @Column()
+  position: string;
 
-    @ManyToOne(() => CricketTeam, team => team.players)
-    @JoinColumn({ name: 'teamId' })
-    team: CricketTeam;
+  @ManyToOne(() => CricketTeam, team => team.players)
+  @JoinColumn({ name: 'teamId' })
+  team: CricketTeam;
 
-    @Column()
-    image_path: string;
+  @Column()
+  image_path: string;
 
-    @OneToMany(() => PlayerPerformance, performance => performance.player)
-    performances: PlayerPerformance[];
+  @OneToMany(() => PlayerPerformance, performance => performance.player)
+  performances: PlayerPerformance[];
 
-    constructor(
-        id: string,
-        teamId: string,
-        firstName: string,
-        lastName: string,
-        position: string,
-        image_path: string
-    ) {
-        this.id = id;
-        this.teamId = teamId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.position = position;
-        this.image_path=image_path
+  constructor(
+    id: string,
+    teamId: string,
+    firstName: string,
+    lastName: string,
+    position: string,
+    image_path: string
+  ) {
+    this.id = id;
+    this.teamId = teamId;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.position = position;
+    this.image_path=image_path
     }
 }
 
