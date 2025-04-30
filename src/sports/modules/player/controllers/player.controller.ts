@@ -1,7 +1,19 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { CricketPlayerService } from '../service/player.service';
 import { CricketPlayer } from 'src/schema';
-import { PlayerStats, PlayerRadarStats } from 'src/types/player.types';
+import {
+  PlayerStats,
+  PlayerRadarStats,
+  PlayerTableViewStats,
+} from 'src/types/player.types';
 
 @Controller('cricket-player')
 export class CricketPlayerController {
@@ -18,13 +30,17 @@ export class CricketPlayerController {
   }
 
   @Get('stats')
-  getPlayerStats(): Promise<PlayerStats[]> {
-    return this.playerService.getPlayerStats();
+  getPlayerStats(@Query('position') position?: string): Promise<PlayerStats[]> {
+    return this.playerService.getPlayerStats(position);
   }
 
   @Get('radar/:id')
   getPlayerRadarStats(@Param('id') id: string): Promise<PlayerRadarStats> {
     return this.playerService.getPlayerRadarStats(id);
+  }
+  @Get('table-stats')
+  getPlayerTableStats(): Promise<PlayerTableViewStats[]> {
+    return this.playerService.getPlayerTableStats();
   }
 
   @Get(':id')

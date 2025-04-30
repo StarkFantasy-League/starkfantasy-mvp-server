@@ -19,3 +19,17 @@ export interface PlayerRadarStats {
     dribbling: number;
   };
 }
+
+export interface PlayerTableViewStats {
+  id: string;
+  position: string;
+  player_name: string;
+  player_team: string;
+  image_path: string;
+  price: number;
+  pointsPerMatch: number;
+  selectedPercentage: number;
+  totalRuns: number;
+  totalWickets: number;
+  minutesPlayed: number;
+}
