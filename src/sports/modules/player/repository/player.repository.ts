@@ -1,5 +1,5 @@
-import { Injectable, ConflictException } from "@nestjs/common";
-import { Repository } from "typeorm";
+import { Injectable, ConflictException } from '@nestjs/common';
+import { Repository, FindManyOptions } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   CricketPlayer,
@@ -34,8 +34,12 @@ export class CricketPlayerRepository {
     return this.playerRepo.save(player);
   }
 
-  findAll() {
-    return this.playerRepo.find();
+  async findAll(position?: string): Promise<CricketPlayer[]> {
+    const findOptions: FindManyOptions<CricketPlayer> = {};
+    if (position) {
+      findOptions.where = { position: position };
+    }
+    return this.playerRepo.find(findOptions);
   }
 
   delete(id: string) {
