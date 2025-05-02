@@ -5,7 +5,11 @@ import {
 } from '@nestjs/common';
 import { CricketPlayerRepository } from '../repository/player.repository';
 import { CricketPlayer } from 'src/schema';
-import { PlayerStats, PlayerRadarStats } from 'src/types/player.types';
+import {
+  PlayerStats,
+  PlayerRadarStats,
+  PlayerTableViewStats,
+} from 'src/types/player.types';
 
 @Injectable()
 export class CricketPlayerService {
@@ -50,9 +54,14 @@ export class CricketPlayerService {
     await this.repo.delete(id);
   }
 
-  async getPlayerStats(): Promise<PlayerStats[]> {
+  // Modified to accept an optional position parameter
+  async getPlayerStats(position?: string): Promise<PlayerStats[]> {
     try {
-      const players = await this.repo.findAll();
+      // Pass the optional position parameter to the repository's findAll method.
+      // Your repository's findAll method needs to handle this parameter
+      // by adding a WHERE clause if position is provided.
+      const players = await this.repo.findAll(position);
+
       const totalMatches = await this.repo.getTotalMatches();
 
       if (!players || players.length === 0) {
@@ -114,7 +123,7 @@ export class CricketPlayerService {
     if (!player) {
       throw new NotFoundException('Player not found');
     }
-    const team = await this.repo.findTeamById(player.teamId);
+
     const performances = await this.repo.getPlayerPerformances(id);
     const history = await this.repo.getPlayerHistory(id);
 
@@ -149,7 +158,7 @@ export class CricketPlayerService {
     const dribbling = Math.min(avgHistoryPoints * 1.5, 100);
 
     return {
-      image_path: team?.image_path || 'Unknown Team Image',
+      image_path: player?.image_path || 'Unknown Player Image',
       player_name: `${player.firstName} ${player.lastName}`,
       stats: {
         goals: Number(goals.toFixed(2)),
@@ -159,5 +168,94 @@ export class CricketPlayerService {
         dribbling: Number(dribbling.toFixed(2)),
       },
     };
+  }
+
+  async getPlayerTableStats(): Promise<PlayerTableViewStats[]> {
+    try {
+      const players = await this.repo.findAll();
+      const totalMatches = await this.repo.getTotalMatches();
+
+      if (!players || players.length === 0) {
+        return [];
+      }
+
+      const playerTableStats: PlayerTableViewStats[] = [];
+
+      const ESTIMATED_MINUTES_PER_MATCH = 120;
+
+      for (const player of players) {
+        try {
+          const team = await this.repo.findTeamById(player.teamId);
+          const performances = await this.repo.getPlayerPerformances(player.id);
+          const history = await this.repo.getPlayerHistory(player.id);
+
+          const matchesPlayed = performances.length;
+
+          const estimatedMinutesPlayed =
+            matchesPlayed * ESTIMATED_MINUTES_PER_MATCH;
+
+          const selectedPercentage =
+            totalMatches > 0 ? (matchesPlayed / totalMatches) * 100 : 0;
+
+          const totalPerformancePoints = performances.reduce(
+            (sum, p) => sum + (p.points || 0),
+            0,
+          );
+          const pointsPerMatch =
+            matchesPlayed > 0 ? totalPerformancePoints / matchesPlayed : 0;
+
+          const totalPerformanceRuns = performances.reduce(
+            (sum, p) => sum + (p.runs || 0),
+            0,
+          );
+
+          const totalPerformanceWickets = performances.reduce(
+            (sum, p) => sum + (p.wickets || 0),
+            0,
+          );
+
+          const totalHistoryPoints = history.reduce(
+            (sum, h) => sum + (h.points || 0),
+            0,
+          );
+          const avgPerformancePoints =
+            matchesPlayed > 0 ? totalPerformancePoints / matchesPlayed : 0;
+
+          const basePrice =
+            totalHistoryPoints +
+            avgPerformancePoints * 5 +
+            totalPerformanceRuns * 0.1 +
+            totalPerformanceWickets * 10;
+
+          //The minimum price should be 20 STRk
+          const price = Math.max(basePrice, 20);
+
+          playerTableStats.push({
+            id: player.id,
+            position: player?.position,
+            player_name: `${player.firstName} ${player.lastName}`,
+            player_team: team?.name || 'Unknown Team',
+            image_path: player.image_path,
+            price: Number(price.toFixed(2)),
+            pointsPerMatch: Number(pointsPerMatch.toFixed(2)),
+            selectedPercentage: Number(selectedPercentage.toFixed(2)),
+            totalRuns: totalPerformanceRuns,
+            totalWickets: totalPerformanceWickets,
+            minutesPlayed: estimatedMinutesPlayed,
+          });
+        } catch (error) {
+          console.error(
+            `Error processing player ${player.id} (${player.firstName} ${player.lastName}) for table stats:`,
+            error,
+          );
+          continue;
+        }
+      }
+
+      return playerTableStats;
+    } catch (error) {
+      console.error('Unexpected error in getPlayerTableStats:', error);
+      throw error;
+    }
   }
 }
