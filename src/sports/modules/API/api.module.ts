@@ -4,10 +4,7 @@ import { SportmonksService } from './sportmonks.service';
 import { CricketTeamModule } from '../team/team.module';
 
 @Module({
-  imports: [
-    HttpModule,
-    CricketTeamModule, 
-  ],
+  imports: [HttpModule, CricketTeamModule],
   providers: [SportmonksService],
   exports: [SportmonksService],
 })

@@ -4,11 +4,18 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CricketPlayerRepository } from '../repository/player.repository';
-import { CricketPlayer } from 'src/schema';
+import {
+  CricketPlayer,
+  PlayerPerformance,
+  CricketPlayerHistorial,
+  CricketTeam,
+} from 'src/schema';
 import {
   PlayerStats,
   PlayerRadarStats,
   PlayerTableViewStats,
+  PaginatedPlayerStats,
+  HomeData,
 } from 'src/types/player.types';
 
 @Injectable()
@@ -26,16 +33,22 @@ export class CricketPlayerService {
     );
     try {
       return await this.repo.create(playerToCreate);
-    } catch (error) {
-      if (error.code === '23505' || error.number === 2627) {
+    } catch (error: unknown) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        ((error as any).code === '23505' || (error as any).number === 2627)
+      ) {
         throw new ConflictException('The player ID already exists');
       }
+      console.error('Error creating player:', error);
       throw error;
     }
   }
 
-  findAll(): Promise<CricketPlayer[]> {
-    return this.repo.findAll();
+  async findAll(): Promise<CricketPlayer[]> {
+    const [players] = await this.repo.findAll();
+    return players;
   }
 
   async findOne(id: string): Promise<CricketPlayer> {
@@ -54,26 +67,61 @@ export class CricketPlayerService {
     await this.repo.delete(id);
   }
 
-  // Modified to accept an optional position parameter
-  async getPlayerStats(position?: string): Promise<PlayerStats[]> {
+  async getPlayerStats(
+    position?: string,
+    page = 1,
+    limit = 10,
+  ): Promise<PaginatedPlayerStats> {
     try {
-      // Pass the optional position parameter to the repository's findAll method.
-      // Your repository's findAll method needs to handle this parameter
-      // by adding a WHERE clause if position is provided.
-      const players = await this.repo.findAll(position);
+      const [players, totalPlayers] = await this.repo.findAll(
+        position,
+        page,
+        limit,
+      );
 
-      const totalMatches = await this.repo.getTotalMatches();
+      const [totalMatches, allPerformances, allHistory, allTeams] =
+        await Promise.all([
+          this.repo.getTotalMatches(),
+          this.repo.getAllPlayerPerformances(),
+          this.repo.getAllPlayerHistory(),
+          this.repo.getAllTeams(),
+        ]);
 
       if (!players || players.length === 0) {
-        return [];
+        return {
+          data: [],
+          total: 0,
+          page,
+          limit,
+        };
+      }
+
+      const performancesMap = new Map<string, PlayerPerformance[]>();
+      for (const perf of allPerformances) {
+        if (!performancesMap.has(perf.cricketPlayerId)) {
+          performancesMap.set(perf.cricketPlayerId, []);
+        }
+        performancesMap.get(perf.cricketPlayerId)!.push(perf);
+      }
+
+      const historyMap = new Map<string, CricketPlayerHistorial[]>();
+      for (const hist of allHistory) {
+        if (!historyMap.has(hist.playerId)) {
+          historyMap.set(hist.playerId, []);
+        }
+        historyMap.get(hist.playerId)!.push(hist);
+      }
+
+      const teamsMap = new Map<string, CricketTeam>();
+      for (const team of allTeams) {
+        teamsMap.set(team.id, team);
       }
 
       const playerStats: PlayerStats[] = [];
       for (const player of players) {
         try {
-          const team = await this.repo.findTeamById(player.teamId);
-          const performances = await this.repo.getPlayerPerformances(player.id);
-          const history = await this.repo.getPlayerHistory(player.id);
+          const team = teamsMap.get(player.teamId);
+          const performances = performancesMap.get(player.id) || [];
 
           const matchesPlayed = performances.length;
           const selectedPercentage =
@@ -88,8 +136,13 @@ export class CricketPlayerService {
               ? (totalPerformancePoints / matchesPlayed) * 0.1
               : 0;
 
-          const totalPoints = history.reduce(
-            (sum, h) => sum + (h.points || 0),
+          const totalPointsFromPerformances = performances.reduce(
+            (sum, p) => sum + (p.points || 0),
+            0,
+          );
+
+          const totalRuns = performances.reduce(
+            (sum, p) => sum + (p.runs || 0),
             0,
           );
 
@@ -100,19 +153,28 @@ export class CricketPlayerService {
             image_path: player.image_path,
             selected_percentage: Number(selectedPercentage.toFixed(2)),
             reward_rate: Number(rewardRate.toFixed(2)),
-            points: totalPoints,
+            points: totalPointsFromPerformances,
+            runs: totalRuns,
           });
-        } catch (error) {
+        } catch (error: unknown) {
           console.error(
             `Error processing player ${player.id} (${player.firstName} ${player.lastName}):`,
+            error instanceof Error
+              ? error.message
+              : 'An unknown error occurred',
             error,
           );
           continue;
         }
       }
 
-      return playerStats;
-    } catch (error) {
+      return {
+        data: playerStats,
+        total: totalPlayers,
+        page,
+        limit,
+      };
+    } catch (error: unknown) {
       console.error('Unexpected error in getPlayerStats:', error);
       throw error;
     }
@@ -124,14 +186,14 @@ export class CricketPlayerService {
       throw new NotFoundException('Player not found');
     }
 
-    const performances = await this.repo.getPlayerPerformances(id);
-    const history = await this.repo.getPlayerHistory(id);
+    const [team, performances, history] = await Promise.all([
+      this.repo.findTeamById(player.teamId),
+      this.repo.getPlayerPerformances(id),
+      this.repo.getPlayerHistory(id),
+    ]);
 
-    const avgRuns =
-      performances.length > 0
-        ? performances.reduce((sum, p) => sum + (p.runs || 0), 0) /
-          performances.length
-        : 0;
+    const totalRuns = performances.reduce((sum, p) => sum + (p.runs || 0), 0);
+
     const avgCatches =
       performances.length > 0
         ? performances.reduce((sum, p) => sum + (p.catches || 0), 0) /
@@ -151,17 +213,18 @@ export class CricketPlayerService {
         ? history.reduce((sum, h) => sum + (h.points || 0), 0) / history.length
         : 0;
 
-    const goals = Math.min(avgRuns * 2, 100);
+    const runs = totalRuns;
     const assists = Math.min(avgCatches * 20, 100);
     const hitting = Math.min(avgHistoryRuns * 2, 100);
     const speed = Math.min(avgWickets * 20, 100);
     const dribbling = Math.min(avgHistoryPoints * 1.5, 100);
 
     return {
-      image_path: player?.image_path || 'Unknown Player Image',
+      image_path: player?.image_path || 'Unknown Team Image',
+      team_name: team?.name || 'Unknown Team',
       player_name: `${player.firstName} ${player.lastName}`,
       stats: {
-        goals: Number(goals.toFixed(2)),
+        runs: Number(runs.toFixed(2)),
         assists: Number(assists.toFixed(2)),
         hitting: Number(hitting.toFixed(2)),
         speed: Number(speed.toFixed(2)),
@@ -170,13 +233,43 @@ export class CricketPlayerService {
     };
   }
 
-  async getPlayerTableStats(): Promise<PlayerTableViewStats[]> {
+  async getPlayerTableStats(
+    position?: string,
+  ): Promise<PlayerTableViewStats[]> {
     try {
-      const players = await this.repo.findAll();
-      const totalMatches = await this.repo.getTotalMatches();
+      const [players] = await this.repo.findAll(position);
+
+      const [totalMatches, allPerformances, allHistory, allTeams] =
+        await Promise.all([
+          this.repo.getTotalMatches(),
+          this.repo.getAllPlayerPerformances(),
+          this.repo.getAllPlayerHistory(),
+          this.repo.getAllTeams(),
+        ]);
 
       if (!players || players.length === 0) {
         return [];
+      }
+
+      const performancesMap = new Map<string, PlayerPerformance[]>();
+      for (const perf of allPerformances) {
+        if (!performancesMap.has(perf.cricketPlayerId)) {
+          performancesMap.set(perf.cricketPlayerId, []);
+        }
+        performancesMap.get(perf.cricketPlayerId)!.push(perf);
+      }
+
+      const historyMap = new Map<string, CricketPlayerHistorial[]>();
+      for (const hist of allHistory) {
+        if (!historyMap.has(hist.playerId)) {
+          historyMap.set(hist.playerId, []);
+        }
+        historyMap.get(hist.playerId)!.push(hist);
+      }
+
+      const teamsMap = new Map<string, CricketTeam>();
+      for (const team of allTeams) {
+        teamsMap.set(team.id, team);
       }
 
       const playerTableStats: PlayerTableViewStats[] = [];
@@ -185,9 +278,9 @@ export class CricketPlayerService {
 
       for (const player of players) {
         try {
-          const team = await this.repo.findTeamById(player.teamId);
-          const performances = await this.repo.getPlayerPerformances(player.id);
-          const history = await this.repo.getPlayerHistory(player.id);
+          const team = teamsMap.get(player.teamId);
+          const performances = performancesMap.get(player.id) || [];
+          const history = historyMap.get(player.id) || [];
 
           const matchesPlayed = performances.length;
 
@@ -227,7 +320,6 @@ export class CricketPlayerService {
             totalPerformanceRuns * 0.1 +
             totalPerformanceWickets * 10;
 
-          //The minimum price should be 20 STRk
           const price = Math.max(basePrice, 20);
 
           playerTableStats.push({
@@ -243,9 +335,12 @@ export class CricketPlayerService {
             totalWickets: totalPerformanceWickets,
             minutesPlayed: estimatedMinutesPlayed,
           });
-        } catch (error) {
+        } catch (error: unknown) {
           console.error(
             `Error processing player ${player.id} (${player.firstName} ${player.lastName}) for table stats:`,
+            error instanceof Error
+              ? error.message
+              : 'An unknown error occurred',
             error,
           );
           continue;
@@ -253,8 +348,124 @@ export class CricketPlayerService {
       }
 
       return playerTableStats;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Unexpected error in getPlayerTableStats:', error);
+      throw error;
+    }
+  }
+
+  async getHomeData(): Promise<HomeData> {
+    try {
+      const [
+        allPlayers,
+        allPerformances,
+        allHistory,
+        allTeams,
+        upcomingMatches,
+      ] = await Promise.all([
+        this.repo.findAll(),
+        this.repo.getAllPlayerPerformances(),
+        this.repo.getAllPlayerHistory(),
+        this.repo.getAllTeams(),
+        this.repo.getUpcomingMatches(),
+      ]);
+
+      const [players] = allPlayers;
+
+      if (!players || players.length === 0) {
+        return {
+          topPlayers: [],
+          upcomingMatches:
+            upcomingMatches.map((match) => ({
+              id: match.id,
+              homeTeamId: match.homeTeamId,
+              awayTeamId: match.awayTeamId,
+              matchDate: match.matchDate,
+              homeTeam: match.homeTeam,
+              awayTeam: match.awayTeam,
+              pool: match.pool,
+            })) || [],
+        };
+      }
+
+      const performancesMap = new Map<string, PlayerPerformance[]>();
+      for (const perf of allPerformances) {
+        if (!performancesMap.has(perf.cricketPlayerId)) {
+          performancesMap.set(perf.cricketPlayerId, []);
+        }
+        performancesMap.get(perf.cricketPlayerId)!.push(perf);
+      }
+
+      const historyMap = new Map<string, CricketPlayerHistorial[]>();
+      for (const hist of allHistory) {
+        if (!historyMap.has(hist.playerId)) {
+          historyMap.set(hist.playerId, []);
+        }
+        historyMap.get(hist.playerId)!.push(hist);
+      }
+
+      const teamsMap = new Map<string, CricketTeam>();
+      for (const team of allTeams) {
+        teamsMap.set(team.id, team);
+      }
+
+      const allPlayerStats: PlayerStats[] = [];
+      for (const player of players) {
+        try {
+          const team = teamsMap.get(player.teamId);
+          const performances = performancesMap.get(player.id) || [];
+
+          const totalPointsFromPerformances = performances.reduce(
+            (sum, p) => sum + (p.points || 0),
+            0,
+          );
+
+          const totalRuns = performances.reduce(
+            (sum, p) => sum + (p.runs || 0),
+            0,
+          );
+
+          allPlayerStats.push({
+            id: player.id,
+            player_name: `${player.firstName} ${player.lastName}`,
+            player_team: team?.name || 'Unknown',
+            image_path: player.image_path,
+            points: totalPointsFromPerformances,
+            runs: totalRuns,
+            selected_percentage: 0,
+            reward_rate: 0,
+          });
+        } catch (error: unknown) {
+          console.error(
+            `Error calculating points/runs for player ${player.id} (${player.firstName} ${player.lastName}) for home data:`,
+            error instanceof Error
+              ? error.message
+              : 'An unknown error occurred',
+            error,
+          );
+          continue;
+        }
+      }
+
+      const topPlayers = allPlayerStats
+        .sort((a, b) => b.runs - a.runs)
+        .slice(0, 5);
+
+      return {
+        topPlayers: topPlayers,
+        upcomingMatches:
+          upcomingMatches.map((match) => ({
+            id: match.id,
+            homeTeamId: match.homeTeamId,
+            awayTeamId: match.awayTeamId,
+            matchDate: match.matchDate,
+            homeTeam: match.homeTeam,
+            awayTeam: match.awayTeam,
+            pool: match.pool,
+          })) || [],
+      };
+    } catch (error: unknown) {
+      console.error('Unexpected error in getHomeData:', error);
       throw error;
     }
   }
