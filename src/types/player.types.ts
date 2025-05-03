@@ -1,3 +1,24 @@
+export interface Team {
+  id: string;
+  name: string;
+  image_path: string;
+}
+
+export interface Match {
+  id: string;
+  homeTeamId: string;
+  awayTeamId: string;
+  matchDate: Date;
+  homeTeam: Team;
+  awayTeam: Team;
+  pool: any;
+}
+
+export interface HomeData {
+  topPlayers: PlayerStats[];
+  upcomingMatches: Match[];
+}
+
 export interface PlayerStats {
   id: string;
   player_name: string;
@@ -6,13 +27,15 @@ export interface PlayerStats {
   selected_percentage: number;
   reward_rate: number;
   points: number;
+  runs: number;
 }
 
 export interface PlayerRadarStats {
   image_path: string;
+  team_name: string;
   player_name: string;
   stats: {
-    goals: number;
+    runs: number;
     assists: number;
     hitting: number;
     speed: number;
@@ -32,4 +55,11 @@ export interface PlayerTableViewStats {
   totalRuns: number;
   totalWickets: number;
   minutesPlayed: number;
+}
+
+export interface PaginatedPlayerStats {
+  data: PlayerStats[];
+  total: number;
+  page: number;
+  limit: number;
 }
