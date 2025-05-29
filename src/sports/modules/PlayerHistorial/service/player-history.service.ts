@@ -9,10 +9,11 @@ export class PlayerServiceHistory {
   async create(entity: CricketPlayerHistorial) {
     const historial = new CricketPlayerHistorial(
       entity.playerId,
-      entity.runs,
-      entity.catches,
-      entity.wickets,
-      entity.points
+      entity.goals,
+      entity.assists,
+      entity.clean_sheet,
+      entity.yellow_card,
+      entity.red_card
     );
     try {
       return await this.repo.create(historial);
@@ -41,27 +42,54 @@ export class PlayerServiceHistory {
     await this.repo.delete(id);
   }
 
-  // 🟢 Añadir puntos (pts) por playerId
-  async addPts(playerId: string, pts: number) {
-    const updated = await this.repo.addPtsByPlayerId(playerId, pts);
+  async update(id: string, data: Partial<CricketPlayerHistorial>) {
+    const historial = await this.repo.findOne(id);
+    if (!historial) {
+      throw new NotFoundException('player history not found');
+    }
+    await this.repo.update(id, data);
+    return this.repo.findOne(id);
+  }
+
+  // 🟢 Añadir goles por playerId
+  async addGoals(playerId: string, goals: number) {
+    const updated = await this.repo.addGoalsByPlayerId(playerId, goals);
     if (!updated) {
       throw new NotFoundException('player history not found');
     }
     return updated;
   }
 
-  // 🟢 Añadir runs por playerId
-  async addRuns(playerId: string, runs: number) {
-    const updated = await this.repo.addRunsByPlayerId(playerId, runs);
+  // 🟢 Añadir asistencias por playerId
+  async addAssists(playerId: string, assists: number) {
+    const updated = await this.repo.addAssistsByPlayerId(playerId, assists);
     if (!updated) {
       throw new NotFoundException('player history not found');
     }
     return updated;
   }
 
-  // 🟢 Añadir wickets por playerId
-  async addWickets(playerId: string, wickets: number) {
-    const updated = await this.repo.addWicketsByPlayerId(playerId, wickets);
+  // 🟢 Añadir clean sheets por playerId
+  async addCleanSheet(playerId: string, cleanSheet: number) {
+    const updated = await this.repo.addCleanSheetByPlayerId(playerId, cleanSheet);
+    if (!updated) {
+      throw new NotFoundException('player history not found');
+    }
+    return updated;
+  }
+
+  // 🟢 Añadir tarjetas amarillas por playerId
+  async addYellowCard(playerId: string, yellowCard: number) {
+    const updated = await this.repo.addYellowCardByPlayerId(playerId, yellowCard);
+    if (!updated) {
+      throw new NotFoundException('player history not found');
+    }
+    return updated;
+  }
+
+  // 🟢 Añadir tarjetas rojas por playerId
+  async addRedCard(playerId: string, redCard: number) {
+    const updated = await this.repo.addRedCardByPlayerId(playerId, redCard);
     if (!updated) {
       throw new NotFoundException('player history not found');
     }
