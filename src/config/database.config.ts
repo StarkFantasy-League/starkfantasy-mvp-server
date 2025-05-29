@@ -9,6 +9,10 @@ import {
   BetsOptions,
   SpecialBet,
   CricketPlayerHistorial,
+  SoccerPool,
+  SoccerMatch,
+  SoccerTeam,
+  SoccerPlayer,
 } from 'src/schema';
 
 export const getDatabaseConfig = (
@@ -33,6 +37,10 @@ export const getDatabaseConfig = (
     BetsOptions,
     SpecialBet,
     CricketPlayerHistorial,
+    SoccerPool,
+    SoccerMatch,
+    SoccerTeam,
+    SoccerPlayer,
   ],
   synchronize: false,
 });
