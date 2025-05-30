@@ -15,8 +15,7 @@ export class PlayerHistoryRepository {
   }
 
   findAll() {
-    return this.repo.find({    relations: ['player']});
-
+    return this.repo.find({ relations: ['player'] });
   }
 
   delete(id: string) {
@@ -31,24 +30,38 @@ export class PlayerHistoryRepository {
     return this.repo.update(id, data);
   }
 
-  async addPtsByPlayerId(playerId: string, pointsToAdd: number) {
+  async addGoalsByPlayerId(playerId: string, goalsToAdd: number) {
     const record = await this.repo.findOne({ where: { playerId } });
     if (!record) return null;
-    record.points += pointsToAdd;
+    record.goals += goalsToAdd;
     return this.repo.save(record);
   }
 
-  async addRunsByPlayerId(playerId: string, runsToAdd: number) {
+  async addAssistsByPlayerId(playerId: string, assistsToAdd: number) {
     const record = await this.repo.findOne({ where: { playerId } });
     if (!record) return null;
-    record.runs += runsToAdd;
+    record.assists += assistsToAdd;
     return this.repo.save(record);
   }
 
-  async addWicketsByPlayerId(playerId: string, wicketsToAdd: number) {
+  async addCleanSheetByPlayerId(playerId: string, cleanSheetToAdd: number) {
     const record = await this.repo.findOne({ where: { playerId } });
     if (!record) return null;
-    record.wickets += wicketsToAdd;
+    record.clean_sheet += cleanSheetToAdd;
+    return this.repo.save(record);
+  }
+
+  async addYellowCardByPlayerId(playerId: string, yellowCardToAdd: number) {
+    const record = await this.repo.findOne({ where: { playerId } });
+    if (!record) return null;
+    record.yellow_card += yellowCardToAdd;
+    return this.repo.save(record);
+  }
+
+  async addRedCardByPlayerId(playerId: string, redCardToAdd: number) {
+    const record = await this.repo.findOne({ where: { playerId } });
+    if (!record) return null;
+    record.red_card += redCardToAdd;
     return this.repo.save(record);
   }
 }

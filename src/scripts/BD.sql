@@ -90,4 +90,16 @@ CREATE TABLE cricket_player_historial (
   CONSTRAINT FK_playerHistorial FOREIGN KEY (playerId) REFERENCES cricket_player(id)
 );
 
+CREATE TABLE player_historial (
+  id VARCHAR(100) NOT NULL DEFAULT CAST(NEWID() AS VARCHAR(100)),
+  playerId VARCHAR(100),
+  goals INT,
+  assists INT,
+  clean_sheet INT,
+  yellow_card INT,
+  red_card INT,
+  CONSTRAINT PK_PlayerHistorialID PRIMARY KEY (id),
+  CONSTRAINT FK_PlayerHistorialPlayer FOREIGN KEY (playerId) REFERENCES cricket_player(id)
+);
+
 

@@ -141,7 +141,7 @@ export class CricketPlayerService {
             0,
           );
 
-          const totalRuns = performances.reduce(
+          const totalGoals = performances.reduce(
             (sum, p) => sum + (p.runs || 0),
             0,
           );
@@ -153,8 +153,8 @@ export class CricketPlayerService {
             image_path: player.image_path,
             selected_percentage: Number(selectedPercentage.toFixed(2)),
             reward_rate: Number(rewardRate.toFixed(2)),
-            points: totalPointsFromPerformances,
-            runs: totalRuns,
+            points: 0,
+            runs: totalGoals,
           });
         } catch (error: unknown) {
           console.error(
@@ -192,43 +192,25 @@ export class CricketPlayerService {
       this.repo.getPlayerHistory(id),
     ]);
 
-    const totalRuns = performances.reduce((sum, p) => sum + (p.runs || 0), 0);
-
-    const avgCatches =
-      performances.length > 0
-        ? performances.reduce((sum, p) => sum + (p.catches || 0), 0) /
-          performances.length
-        : 0;
-    const avgWickets =
-      performances.length > 0
-        ? performances.reduce((sum, p) => sum + (p.wickets || 0), 0) /
-          performances.length
-        : 0;
-    const avgHistoryRuns =
-      history.length > 0
-        ? history.reduce((sum, h) => sum + (h.runs || 0), 0) / history.length
-        : 0;
-    const avgHistoryPoints =
-      history.length > 0
-        ? history.reduce((sum, h) => sum + (h.points || 0), 0) / history.length
-        : 0;
-
-    const runs = totalRuns;
-    const assists = Math.min(avgCatches * 20, 100);
-    const hitting = Math.min(avgHistoryRuns * 2, 100);
-    const speed = Math.min(avgWickets * 20, 100);
-    const dribbling = Math.min(avgHistoryPoints * 1.5, 100);
+    // Soccer: Use goals and assists for radar stats
+    const totalGoals = history.length > 0 ? history.reduce((sum, h) => sum + (h.goals || 0), 0) : 0;
+    const totalAssists = history.length > 0 ? history.reduce((sum, h) => sum + (h.assists || 0), 0) : 0;
+    const avgGoals = history.length > 0 ? totalGoals / history.length : 0;
+    const avgAssists = history.length > 0 ? totalAssists / history.length : 0;
+    const avgCleanSheet = history.length > 0 ? history.reduce((sum, h) => sum + (h.clean_sheet || 0), 0) / history.length : 0;
+    const avgYellowCard = history.length > 0 ? history.reduce((sum, h) => sum + (h.yellow_card || 0), 0) / history.length : 0;
+    const avgRedCard = history.length > 0 ? history.reduce((sum, h) => sum + (h.red_card || 0), 0) / history.length : 0;
 
     return {
       image_path: player?.image_path || 'Unknown Team Image',
       team_name: team?.name || 'Unknown Team',
       player_name: `${player.firstName} ${player.lastName}`,
       stats: {
-        runs: Number(runs.toFixed(2)),
-        assists: Number(assists.toFixed(2)),
-        hitting: Number(hitting.toFixed(2)),
-        speed: Number(speed.toFixed(2)),
-        dribbling: Number(dribbling.toFixed(2)),
+        runs: Number(avgGoals.toFixed(2)), // Map goals to runs for radar
+        assists: Number(avgAssists.toFixed(2)),
+        hitting: Number(avgCleanSheet.toFixed(2)),
+        speed: Number(avgYellowCard.toFixed(2)),
+        dribbling: Number(avgRedCard.toFixed(2)),
       },
     };
   }
@@ -308,7 +290,7 @@ export class CricketPlayerService {
           );
 
           const totalHistoryPoints = history.reduce(
-            (sum, h) => sum + (h.points || 0),
+            (sum, h) => sum + (h.goals || 0),
             0,
           );
           const avgPerformancePoints =
@@ -420,7 +402,7 @@ export class CricketPlayerService {
             0,
           );
 
-          const totalRuns = performances.reduce(
+          const totalGoals = performances.reduce(
             (sum, p) => sum + (p.runs || 0),
             0,
           );
@@ -430,8 +412,8 @@ export class CricketPlayerService {
             player_name: `${player.firstName} ${player.lastName}`,
             player_team: team?.name || 'Unknown',
             image_path: player.image_path,
-            points: totalPointsFromPerformances,
-            runs: totalRuns,
+            points: 0,
+            runs: totalGoals,
             selected_percentage: 0,
             reward_rate: 0,
           });
