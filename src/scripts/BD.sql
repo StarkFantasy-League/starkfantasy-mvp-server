@@ -4,10 +4,10 @@ Use StarkFantasy
 
 
 CREATE TABLE cricket_team (
-id VARCHAR(100) UNIQUE NOT NULL,
-name VARCHAR (200),
-image_path VARCHAR(300),
-    CONSTRAINT PK_CricketTeamID PRIMARY KEY (Id)
+  id VARCHAR(100) UNIQUE NOT NULL,
+  name VARCHAR (200),
+  image_path VARCHAR(300),
+  CONSTRAINT PK_CricketTeamID PRIMARY KEY (Id)
 )
 
 CREATE TABLE cricket_match (

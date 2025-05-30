@@ -10,24 +10,34 @@ export class CricketTeamRepository {
     private readonly repo: Repository<CricketTeam>,
   ) {}
 
-  async create(team: CricketTeam) {
-    const existing = await this.repo.findOne({ where: { id: team.id } });
+  async create(teamData: CricketTeam): Promise<CricketTeam> {
+    const existing = await this.repo.findOne({ where: { id: teamData.id } });
     if (existing) {
       throw new ConflictException('The team ID already exists');
     }
 
-    return this.repo.save(team);
+    return this.repo.save(teamData);
   }
 
-  findAll() {
+  async findAll(): Promise<CricketTeam[]> {
     return this.repo.find();
   }
 
-  findOne(id: string) {
+  async findOne(id: string): Promise<CricketTeam | null> {
     return this.repo.findOne({ where: { id } });
   }
 
-  delete(id: string) {
-    return this.repo.delete(id);
+  async update(id: string, teamData: Partial<CricketTeam>): Promise<CricketTeam> {
+    const existing = await this.repo.findOne({ where: { id } });
+    if (!existing) {
+      throw new ConflictException('The team ID does not exist');
+    }
+
+    Object.assign(existing, teamData);
+    return this.repo.save(existing);
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.repo.delete(id);
   }
 }
