@@ -10,9 +10,10 @@ import {
 import { CricketPlayerService } from '../service/player.service';
 import { CricketPlayer } from 'src/schema';
 import {
-  PlayerStats,
   PlayerRadarStats,
   PlayerTableViewStats,
+  PaginatedPlayerStats,
+  HomeData,
 } from 'src/types/player.types';
 
 @Controller('cricket-player')
@@ -29,17 +30,33 @@ export class CricketPlayerController {
     return this.playerService.findAll();
   }
 
+  @Get('home-data')
+  async getHomeData(): Promise<HomeData> {
+    console.log('Controller: Received request for /cricket-player/home-data');
+    return this.playerService.getHomeData();
+  }
+
   @Get('stats')
-  getPlayerStats(@Query('position') position?: string): Promise<PlayerStats[]> {
-    return this.playerService.getPlayerStats(position);
+  getPlayerStats(
+    @Query('position') position?: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<PaginatedPlayerStats> {
+    return this.playerService.getPlayerStats(
+      position,
+      Number(page),
+      Number(limit),
+    );
   }
 
   @Get('radar/:id')
   getPlayerRadarStats(@Param('id') id: string): Promise<PlayerRadarStats> {
     return this.playerService.getPlayerRadarStats(id);
   }
+
   @Get('table-stats')
   getPlayerTableStats(): Promise<PlayerTableViewStats[]> {
+    console.log('Controller: Received request for /cricket-player/home-data');
     return this.playerService.getPlayerTableStats();
   }
 
