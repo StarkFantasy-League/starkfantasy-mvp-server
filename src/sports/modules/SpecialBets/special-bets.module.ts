@@ -9,6 +9,6 @@ import { SpecialBet } from 'src/schema';
   imports: [TypeOrmModule.forFeature([SpecialBet])],
   controllers: [SpecialBetController],
   providers: [SpecialBetRepository, SpecialBetService],
-      exports: [SpecialBetService], 
+  exports: [SpecialBetService],
 })
 export class SpecialBetModule {}
