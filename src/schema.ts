@@ -137,6 +137,126 @@ export class CricketPool {
 }
 
 @Entity()
+export class SoccerTeam {
+  @PrimaryColumn()
+  id: string;
+
+  @Column()
+  name: string;
+
+  @Column()
+  image_path: string;
+
+  @OneToMany(() => SoccerPlayer, (player) => player.team)
+  players: SoccerPlayer[];
+
+  constructor(id: string, name: string, image_path: string) {
+    this.id = id;
+    this.name = name;
+    this.image_path = image_path;
+  }
+}
+
+@Entity()
+export class SoccerPlayer {
+  @PrimaryColumn()
+  id: string;
+
+  @Column()
+  teamId: string;
+
+  @Column()
+  firstName: string;
+
+  @Column()
+  lastName: string;
+
+  @Column()
+  position: string;
+
+  @ManyToOne(() => SoccerTeam, (team) => team.players)
+  @JoinColumn({ name: 'teamId' })
+  team: SoccerTeam;
+
+  @Column()
+  image_path: string;
+
+  constructor(
+    id: string,
+    teamId: string,
+    firstName: string,
+    lastName: string,
+    position: string,
+    image_path: string,
+  ) {
+    this.id = id;
+    this.teamId = teamId;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.position = position;
+    this.image_path = image_path;
+  }
+}
+
+@Entity()
+export class SoccerMatch {
+  @PrimaryColumn()
+  id: string;
+
+  @Column()
+  homeTeamId: string;
+
+  @Column()
+  awayTeamId: string;
+
+  @Column({ type: 'datetime' })
+  matchDate: Date;
+
+  @ManyToOne(() => SoccerTeam)
+  @JoinColumn({ name: 'homeTeamId' })
+  homeTeam: SoccerTeam;
+
+  @ManyToOne(() => SoccerTeam)
+  @JoinColumn({ name: 'awayTeamId' })
+  awayTeam: SoccerTeam;
+
+  @OneToOne(() => SoccerPool, (pool) => pool.match)
+  pool: SoccerPool | null;
+
+  constructor(
+    id: string,
+    homeTeamId: string,
+    awayTeamId: string,
+    matchDate: Date,
+  ) {
+    this.id = id;
+    this.homeTeamId = homeTeamId;
+    this.awayTeamId = awayTeamId;
+    this.matchDate = matchDate;
+    this.pool = null;
+  }
+}
+
+@Entity()
+export class SoccerPool {
+  @PrimaryColumn()
+  @Generated('uuid')
+  id: string;
+
+  @Column()
+  matchId: string;
+
+  @OneToOne(() => SoccerMatch)
+  @JoinColumn({ name: 'matchId' })
+  match: SoccerMatch;
+
+  constructor(id: string, matchId: string) {
+    this.id = id;
+    this.matchId = matchId;
+  }
+}
+
+@Entity()
 export class PlayerPerformance {
   @PrimaryColumn()
   @Generated('uuid')
@@ -211,7 +331,6 @@ export class SpecialBet {
   @Column()
   playerId: string;
 
-  s;
   @ManyToOne(() => BetsOptions)
   @JoinColumn({ name: 'specialBetId' })
   specialBet: BetsOptions;
@@ -263,5 +382,31 @@ export class CricketPlayerHistorial {
     this.wickets = wickets;
     this.catches = catches;
     this.points = points;
+  }
+}
+
+@Entity('soccer_special_bet')
+export class SoccerSpecialBet {
+  @PrimaryColumn()
+  @Generated('uuid')
+  id: string;
+
+  @Column()
+  specialBetId: string;
+
+  @Column()
+  playerId: string;
+
+  @ManyToOne(() => BetsOptions)
+  @JoinColumn({ name: 'specialBetId' })
+  specialBet: BetsOptions;
+
+  @ManyToOne(() => SoccerPlayer)
+  @JoinColumn({ name: 'playerId' })
+  player: SoccerPlayer;
+
+  constructor(specialBetId: string, playerId: string) {
+    this.specialBetId = specialBetId;
+    this.playerId = playerId;
   }
 }

@@ -3,17 +3,17 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
-import { CricketPoolRepository } from '../repository/pool.repository';
-import { CricketPool } from 'src/schema';
+import { SoccerPoolRepository } from '../repository/soccer-pool.repository';
+import { SoccerPool } from 'src/schema';
 
 @Injectable()
-export class CricketPoolService {
-  constructor(private readonly poolRepo: CricketPoolRepository) {}
+export class SoccerPoolService {
+  constructor(private readonly poolRepo: SoccerPoolRepository) {}
 
-  async create(entity: CricketPool) {
-    const team = new CricketPool(entity.id, entity.cricketMatchId);
+  async create(entity: SoccerPool) {
+    const pool = new SoccerPool(entity.id, entity.matchId);
     try {
-      return await this.poolRepo.create(team);
+      return await this.poolRepo.create(pool);
     } catch (error) {
       if (error.code === '23505' || error.number === 2627) {
         throw new ConflictException('The pool ID already exists');
@@ -27,16 +27,16 @@ export class CricketPoolService {
   }
 
   async findOne(id: string) {
-    const team = await this.poolRepo.findOne(id);
-    if (!team) {
+    const pool = await this.poolRepo.findOne(id);
+    if (!pool) {
       throw new NotFoundException('pool not found');
     }
-    return team;
+    return pool;
   }
 
   async delete(id: string): Promise<void> {
-    const team = await this.poolRepo.findOne(id);
-    if (!team) {
+    const pool = await this.poolRepo.findOne(id);
+    if (!pool) {
       throw new NotFoundException('pool not found');
     }
     await this.poolRepo.delete(id);

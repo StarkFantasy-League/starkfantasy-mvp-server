@@ -1,13 +1,13 @@
 import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
-import { CricketPoolService } from '../service/pool.service';
-import { CricketPool } from 'src/schema';
+import { SoccerPoolService } from '../service/soccer-pool.service';
+import { SoccerPool } from 'src/schema';
 
-@Controller('cricket-pool')
-export class CricketPoolController {
-  constructor(private readonly poolService: CricketPoolService) {}
+@Controller('soccer-pool')
+export class SoccerPoolController {
+  constructor(private readonly poolService: SoccerPoolService) {}
 
   @Post()
-  create(@Body() dto: CricketPool) {
+  create(@Body() dto: SoccerPool) {
     return this.poolService.create(dto);
   }
 

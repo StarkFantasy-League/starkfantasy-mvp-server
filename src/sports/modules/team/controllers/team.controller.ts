@@ -1,30 +1,44 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { CricketTeamService } from '../service/team.service';
-import { CricketTeam } from "src/schema";
-
+import { CricketTeam } from 'src/schema';
 
 @Controller('cricket-team')
-export class CricketTeamController{
-    constructor (private readonly teamService: CricketTeamService){}
+export class CricketTeamController {
+  constructor(private readonly teamService: CricketTeamService) {}
 
-@Post()
-create (@Body() dto: CricketTeam){
-    return this.teamService.create(dto);
-}
+  @Post()
+  async create(@Body() teamData: CricketTeam): Promise<CricketTeam> {
+    return this.teamService.create(teamData);
+  }
 
-@Get()
-findAll(){
+  @Get()
+  async findAll(): Promise<CricketTeam[]> {
     return this.teamService.findAll();
-}
+  }
 
-@Get (':id')
-findOne(@Param ('id') id:string){
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<CricketTeam | null> {
     return this.teamService.findOne(id);
-}
+  }
 
-@Delete (':id')
-delete (@Param('id') id:string){
-return this.teamService.delete(id);
-}
-}
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() teamData: Partial<CricketTeam>,
+  ): Promise<CricketTeam> {
+    return this.teamService.update(id, teamData);
+  }
 
+  @Delete(':id')
+  async delete(@Param('id') id: string): Promise<void> {
+    return this.teamService.delete(id);
+  }
+}

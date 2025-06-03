@@ -18,6 +18,9 @@ import { TaskPlayerPerformance } from './sports/modules/job/player-performance-c
 import { SpecialBetModule } from './sports/modules/SpecialBets/special-bets.module';
 import { PlayerHistoryModule } from './sports/modules/PlayerHistorial/player-history.module';
 import { TaskPlayerHistory } from './sports/modules/job/player-history-cron.service';
+import { SoccerPoolModule } from './sports/modules/soccer/pool/soccer-pool.module';
+import { SoccerSpecialBetModule } from './sports/modules/soccer/specialBets/soccer-special-bet.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,7 +29,8 @@ import { TaskPlayerHistory } from './sports/modules/job/player-history-cron.serv
     ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => getDatabaseConfig(configService),
+      useFactory: (configService: ConfigService) =>
+        getDatabaseConfig(configService),
       inject: [ConfigService],
     }),
     CricketMatchModule,
@@ -36,9 +40,18 @@ import { TaskPlayerHistory } from './sports/modules/job/player-history-cron.serv
     PoolModule,
     SportmonksModule,
     SpecialBetModule,
-    PlayerHistoryModule
+    PlayerHistoryModule,
+    SoccerPoolModule,
+    SoccerSpecialBetModule,
   ],
   controllers: [AppController],
-  providers: [AppService, TaskTeamService, TaskPlayerService, TaskMatchService, TaskPlayerPerformance, TaskPlayerHistory],
+  providers: [
+    AppService,
+    TaskTeamService,
+    TaskPlayerService,
+    TaskMatchService,
+    TaskPlayerPerformance,
+    TaskPlayerHistory,
+  ],
 })
 export class AppModule {}
