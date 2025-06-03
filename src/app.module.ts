@@ -19,6 +19,7 @@ import { SpecialBetModule } from './sports/modules/SpecialBets/special-bets.modu
 import { PlayerHistoryModule } from './sports/modules/PlayerHistorial/player-history.module';
 import { TaskPlayerHistory } from './sports/modules/job/player-history-cron.service';
 import { SoccerPoolModule } from './sports/modules/soccer/pool/soccer-pool.module';
+import { SoccerPlayerModule } from './sports/modules/soccer/player/soccer-player.module';
 
 @Module({
   imports: [
@@ -35,12 +36,12 @@ import { SoccerPoolModule } from './sports/modules/soccer/pool/soccer-pool.modul
     CricketMatchModule,
     CricketTeamModule,
     CricketPlayerModule,
-    PlayerPerformanceModule,
-    PoolModule,
+    PlayerPerformanceModule,    PoolModule,
     SportmonksModule,
     SpecialBetModule,
     PlayerHistoryModule,
     SoccerPoolModule,
+    SoccerPlayerModule,
   ],
   controllers: [AppController],
   providers: [
