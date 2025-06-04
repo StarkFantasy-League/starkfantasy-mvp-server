@@ -1,5 +1,9 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
-import { CricketPoolRepository } from '../repository/pool.repository'; 
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
+import { CricketPoolRepository } from '../repository/pool.repository';
 import { CricketPool } from 'src/schema';
 
 @Injectable()

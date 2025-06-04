@@ -393,3 +393,29 @@ export class CricketPlayerHistorial {
     this.red_card = red_card;
   }
 }
+
+@Entity('soccer_special_bet')
+export class SoccerSpecialBet {
+  @PrimaryColumn()
+  @Generated('uuid')
+  id: string;
+
+  @Column()
+  specialBetId: string;
+
+  @Column()
+  playerId: string;
+
+  @ManyToOne(() => BetsOptions)
+  @JoinColumn({ name: 'specialBetId' })
+  specialBet: BetsOptions;
+
+  @ManyToOne(() => SoccerPlayer)
+  @JoinColumn({ name: 'playerId' })
+  player: SoccerPlayer;
+
+  constructor(specialBetId: string, playerId: string) {
+    this.specialBetId = specialBetId;
+    this.playerId = playerId;
+  }
+}
