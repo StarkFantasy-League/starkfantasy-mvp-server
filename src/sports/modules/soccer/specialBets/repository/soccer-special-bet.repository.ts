@@ -1,38 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SpecialBet } from 'src/schema';
+import { SoccerSpecialBet } from 'src/schema';
 
 @Injectable()
-export class SpecialBetRepository {
+export class SoccerSpecialBetRepository {
   constructor(
-    @InjectRepository(SpecialBet)
-    private readonly repo: Repository<SpecialBet>,
+    @InjectRepository(SoccerSpecialBet)
+    private readonly repo: Repository<SoccerSpecialBet>,
   ) {}
 
-  create(pool: SpecialBet) {
-    return this.repo.insert(pool);
+  create(soccerSpecialBet: SoccerSpecialBet) {
+    return this.repo.insert(soccerSpecialBet);
   }
 
   findAll() {
     return this.repo.find();
   }
+
   delete(id: string) {
     return this.repo.delete(id);
   }
+
   findOne(id: string) {
     return this.repo.findOne({ where: { id } });
   }
 
-  async findByPlayerId(playerId: string): Promise<SpecialBet[]> {
+  async findByPlayerId(playerId: string): Promise<SoccerSpecialBet[]> {
     return this.repo.find({
       where: { playerId: playerId },
     });
   }
 
-  async findByBet(betId: string): Promise<SpecialBet[]> {
+  async findBySpecialBetId(specialBetId: string): Promise<SoccerSpecialBet[]> {
     return this.repo.find({
-      where: { specialBetId: betId },
+      where: { specialBetId: specialBetId },
     });
   }
 }

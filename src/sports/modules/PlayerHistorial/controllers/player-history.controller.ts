@@ -26,18 +26,33 @@ export class PlayerHistoryController {
     return this.playerHistoryService.delete(id);
   }
 
-  @Patch('add-pts/:playerId')
-  addPts(@Param('playerId') playerId: string, @Body('pts') pts: number) {
-    return this.playerHistoryService.addPts(playerId, pts);
+  @Patch('add-goals/:playerId')
+  addGoals(@Param('playerId') playerId: string, @Body('goals') goals: number) {
+    return this.playerHistoryService.addGoals(playerId, goals);
   }
 
-
-  @Patch('add-runs/:playerId')
-  addRuns(@Param('playerId') playerId: string, @Body('runs') runs: number) {
-    return this.playerHistoryService.addRuns(playerId, runs);
+  @Patch('add-assists/:playerId')
+  addAssists(@Param('playerId') playerId: string, @Body('assists') assists: number) {
+    return this.playerHistoryService.addAssists(playerId, assists);
   }
-  @Patch('add-wickets/:playerId')
-  addWickets(@Param('playerId') playerId: string, @Body('wickets') wickets: number) {
-    return this.playerHistoryService.addWickets(playerId, wickets);
+
+  @Patch('add-clean-sheet/:playerId')
+  addCleanSheet(@Param('playerId') playerId: string, @Body('clean_sheet') cleanSheet: number) {
+    return this.playerHistoryService.addCleanSheet(playerId, cleanSheet);
+  }
+
+  @Patch('add-yellow-card/:playerId')
+  addYellowCard(@Param('playerId') playerId: string, @Body('yellow_card') yellowCard: number) {
+    return this.playerHistoryService.addYellowCard(playerId, yellowCard);
+  }
+
+  @Patch('add-red-card/:playerId')
+  addRedCard(@Param('playerId') playerId: string, @Body('red_card') redCard: number) {
+    return this.playerHistoryService.addRedCard(playerId, redCard);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() data: Partial<CricketPlayerHistorial>) {
+    return this.playerHistoryService.update(id, data);
   }
 }

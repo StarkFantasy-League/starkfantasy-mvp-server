@@ -13,6 +13,7 @@ import {
   SoccerMatch,
   SoccerTeam,
   SoccerPlayer,
+  SoccerSpecialBet,
 } from 'src/schema';
 
 export const getDatabaseConfig = (
@@ -41,6 +42,7 @@ export const getDatabaseConfig = (
     SoccerMatch,
     SoccerTeam,
     SoccerPlayer,
+    SoccerSpecialBet,
   ],
   synchronize: false,
 });

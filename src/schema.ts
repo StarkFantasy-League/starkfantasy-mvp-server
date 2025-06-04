@@ -355,16 +355,19 @@ export class CricketPlayerHistorial {
   playerId: string;
 
   @Column()
-  runs: number;
+  goals: number;
 
   @Column()
-  wickets: number;
+  assists: number;
 
   @Column()
-  catches: number;
+  clean_sheet: number;
 
   @Column()
-  points: number;
+  yellow_card: number;
+
+  @Column()
+  red_card: number;
 
   @ManyToOne(() => CricketPlayer)
   @JoinColumn({ name: 'playerId' })
@@ -372,15 +375,47 @@ export class CricketPlayerHistorial {
 
   constructor(
     playerId: string,
+    goals: number = 0,
+    assists: number = 0,
+    clean_sheet: number = 0,
+    yellow_card: number = 0,
+    red_card: number = 0
     runs: number = 0,
     wickets: number = 0,
     catches: number = 0,
     points: number = 0,
   ) {
     this.playerId = playerId;
-    this.runs = runs;
-    this.wickets = wickets;
-    this.catches = catches;
-    this.points = points;
+    this.goals = goals;
+    this.assists = assists;
+    this.clean_sheet = clean_sheet;
+    this.yellow_card = yellow_card;
+    this.red_card = red_card;
+  }
+}
+
+@Entity('soccer_special_bet')
+export class SoccerSpecialBet {
+  @PrimaryColumn()
+  @Generated('uuid')
+  id: string;
+
+  @Column()
+  specialBetId: string;
+
+  @Column()
+  playerId: string;
+
+  @ManyToOne(() => BetsOptions)
+  @JoinColumn({ name: 'specialBetId' })
+  specialBet: BetsOptions;
+
+  @ManyToOne(() => SoccerPlayer)
+  @JoinColumn({ name: 'playerId' })
+  player: SoccerPlayer;
+
+  constructor(specialBetId: string, playerId: string) {
+    this.specialBetId = specialBetId;
+    this.playerId = playerId;
   }
 }
