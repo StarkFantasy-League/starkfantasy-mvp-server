@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, ConflictException } from '@nestjs/common';
-import { Repository, FindManyOptions, MoreThan } from 'typeorm';
+import { Repository, FindManyOptions, MoreThanOrEqual } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   CricketPlayer,
@@ -146,19 +147,68 @@ export class CricketPlayerRepository {
 
   async getUpcomingMatches(): Promise<CricketMatch[]> {
     try {
+      const baseDate = new Date('2025-04-18T00:00:00.000Z');
+      const systemLaunchDate = new Date('2025-06-03T00:00:00.000Z');
+
       const now = new Date();
-      const upcomingMatches = await this.matchRepo.find({
+      const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+      const timeDiff = now.getTime() - systemLaunchDate.getTime();
+      const weeksPassed = Math.floor(timeDiff / msPerWeek);
+
+      const allMatches = await this.matchRepo.find({
         where: {
-          matchDate: MoreThan(now),
+          matchDate: MoreThanOrEqual(new Date('2025-01-01')),
         },
         relations: ['homeTeam', 'awayTeam'],
         order: {
           matchDate: 'ASC',
         },
       });
-      return upcomingMatches;
+
+      const validMatches = allMatches.filter(
+        (match) => match.matchDate && match.id,
+      );
+
+      if (validMatches.length === 0) {
+        return [];
+      }
+
+      const weeklyChunks: CricketMatch[][] = [];
+      let chunkStart = new Date(baseDate);
+
+      const maxWeeks = 20;
+
+      for (let week = 0; week < maxWeeks; week++) {
+        const chunkEnd = new Date(chunkStart.getTime() + msPerWeek);
+
+        const weekMatches = validMatches.filter((match) => {
+          const matchDate = new Date(match.matchDate);
+          return matchDate >= chunkStart && matchDate < chunkEnd;
+        });
+
+        if (weekMatches.length > 0) {
+          weeklyChunks.push(weekMatches);
+        }
+        chunkStart = new Date(chunkEnd);
+
+        if (validMatches.length > 0) {
+          const lastMatchDate = new Date(
+            validMatches[validMatches.length - 1].matchDate,
+          );
+          if (chunkStart > new Date(lastMatchDate.getTime() + msPerWeek)) {
+            break;
+          }
+        }
+      }
+
+      if (weeklyChunks.length === 0) {
+        return [];
+      }
+      const weekIndex = weeksPassed % weeklyChunks.length;
+      const selectedWeek = weeklyChunks[weekIndex] || [];
+
+      return selectedWeek;
     } catch (error) {
-      console.error('Error fetching upcoming matches:', error);
       return [];
     }
   }
