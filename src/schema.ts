@@ -379,7 +379,7 @@ export class CricketPlayerHistorial {
     assists: number = 0,
     clean_sheet: number = 0,
     yellow_card: number = 0,
-    red_card: number = 0
+    red_card: number = 0,
     runs: number = 0,
     wickets: number = 0,
     catches: number = 0,
