@@ -145,6 +145,11 @@ export class CricketPlayerRepository {
     }
   }
 
+  /**
+   * This method retrieves upcoming matches for the current week,
+   * starting from April 18, 2025.
+   * @returns A list of upcoming matches for the current week, starting from April 18, 2025.
+   */
   async getUpcomingMatches(): Promise<CricketMatch[]> {
     try {
       const baseDate = new Date('2025-04-18T00:00:00.000Z');
@@ -155,6 +160,7 @@ export class CricketPlayerRepository {
       const timeDiff = now.getTime() - systemLaunchDate.getTime();
       const weeksPassed = Math.floor(timeDiff / msPerWeek);
 
+      // Get all matches from the repository in year 2025
       const allMatches = await this.matchRepo.find({
         where: {
           matchDate: MoreThanOrEqual(new Date('2025-01-01')),
@@ -166,7 +172,7 @@ export class CricketPlayerRepository {
       });
 
       const validMatches = allMatches.filter(
-        (match) => match.matchDate && match.id,
+        (match) => match.matchDate && match.id, // Ensure matchDate and id are defined
       );
 
       if (validMatches.length === 0) {
