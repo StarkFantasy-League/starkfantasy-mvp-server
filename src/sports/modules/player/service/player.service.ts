@@ -153,7 +153,7 @@ export class CricketPlayerService {
             image_path: player.image_path,
             selected_percentage: Number(selectedPercentage.toFixed(2)),
             reward_rate: Number(rewardRate.toFixed(2)),
-            points: 0,
+            points: totalPointsFromPerformances,
             runs: totalGoals,
           });
         } catch (error: unknown) {
@@ -193,13 +193,31 @@ export class CricketPlayerService {
     ]);
 
     // Soccer: Use goals and assists for radar stats
-    const totalGoals = history.length > 0 ? history.reduce((sum, h) => sum + (h.goals || 0), 0) : 0;
-    const totalAssists = history.length > 0 ? history.reduce((sum, h) => sum + (h.assists || 0), 0) : 0;
+    const totalGoals =
+      history.length > 0
+        ? history.reduce((sum, h) => sum + (h.goals || 0), 0)
+        : 0;
+    const totalAssists =
+      history.length > 0
+        ? history.reduce((sum, h) => sum + (h.assists || 0), 0)
+        : 0;
     const avgGoals = history.length > 0 ? totalGoals / history.length : 0;
     const avgAssists = history.length > 0 ? totalAssists / history.length : 0;
-    const avgCleanSheet = history.length > 0 ? history.reduce((sum, h) => sum + (h.clean_sheet || 0), 0) / history.length : 0;
-    const avgYellowCard = history.length > 0 ? history.reduce((sum, h) => sum + (h.yellow_card || 0), 0) / history.length : 0;
-    const avgRedCard = history.length > 0 ? history.reduce((sum, h) => sum + (h.red_card || 0), 0) / history.length : 0;
+    const avgCleanSheet =
+      history.length > 0
+        ? history.reduce((sum, h) => sum + (h.clean_sheet || 0), 0) /
+          history.length
+        : 0;
+    const avgYellowCard =
+      history.length > 0
+        ? history.reduce((sum, h) => sum + (h.yellow_card || 0), 0) /
+          history.length
+        : 0;
+    const avgRedCard =
+      history.length > 0
+        ? history.reduce((sum, h) => sum + (h.red_card || 0), 0) /
+          history.length
+        : 0;
 
     return {
       image_path: player?.image_path || 'Unknown Team Image',
@@ -412,7 +430,7 @@ export class CricketPlayerService {
             player_name: `${player.firstName} ${player.lastName}`,
             player_team: team?.name || 'Unknown',
             image_path: player.image_path,
-            points: 0,
+            points: totalPointsFromPerformances,
             runs: totalGoals,
             selected_percentage: 0,
             reward_rate: 0,
