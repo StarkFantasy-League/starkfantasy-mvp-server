@@ -117,6 +117,12 @@ export class CricketMatch {
   }
 }
 
+export enum CricketPoolStatus {
+  Pending = 'pending',
+  Finished = 'finished',
+  Cancelled = 'cancelled',
+}
+
 @Entity()
 export class CricketPool {
   @PrimaryColumn()
@@ -130,10 +136,28 @@ export class CricketPool {
   @JoinColumn({ name: 'cricketMatchId' })
   match: CricketMatch;
 
-  constructor(id: string, cricketMatchId: string) {
-    this.id = id;
-    this.cricketMatchId = cricketMatchId;
+
+
+  @Column({ type: 'varchar', length: 50, default: CricketPoolStatus.Pending })
+  status: CricketPoolStatus; // e.g., 'pending', 'finished', 'cancelled'
+
+  @Column({ type: 'int', nullable: true })
+  homeResult: number | null;
+
+  @Column({ type: 'int', nullable: true })
+  awayResult: number | null;
+
+
+  constructor(matchId: string, poolId?: string) {
+    this.cricketMatchId = matchId;
+    // Generate a new UUID if no ID is provided
+    if (poolId)
+      this.id = poolId;
+    this.status = CricketPoolStatus.Pending; // Default status
+    this.homeResult = null; // Default result
+    this.awayResult = null; // Default result
   }
+
 }
 
 @Entity()

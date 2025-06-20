@@ -4,14 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CricketPoolRepository } from '../repository/pool.repository';
-import { CricketPool } from 'src/schema';
+import { CricketPool, CricketPoolStatus } from 'src/schema';
 
 @Injectable()
 export class CricketPoolService {
   constructor(private readonly poolRepo: CricketPoolRepository) {}
 
   async create(entity: CricketPool) {
-    const team = new CricketPool(entity.id, entity.cricketMatchId);
+    const team = new CricketPool(entity.cricketMatchId, entity.id);
     try {
       return await this.poolRepo.create(team);
     } catch (error) {
@@ -41,4 +41,19 @@ export class CricketPoolService {
     }
     await this.poolRepo.delete(id);
   }
+
+  async updatePoolResults(id: string, match: any): Promise<CricketPool> {
+    const pool = await this.poolRepo.findOne(id);
+    if (!pool) {
+      throw new NotFoundException('Pool not found');
+    }
+
+    // Update the pool results based on the match data
+    pool.homeResult = 0;
+    pool.awayResult = 0;
+    pool.status = CricketPoolStatus.Finished; // Assuming the match is finished
+
+    return this.poolRepo.update(pool);
+  }
+
 }

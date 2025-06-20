@@ -55,8 +55,11 @@ CREATE TABLE player_performance (
 
 
 CREATE TABLE cricket_pool (
-  id VARCHAR(100) NOT NULL DEFAULT CAST(NEWID() AS VARCHAR(100)),
-  cricketMatchID VARCHAR(100),
+  id VARCHAR(100) NOT NULL,
+  cricketMatchID VARCHAR(100) NOT NULL,
+  status VARCHAR(20) NOT NULL CHECK (status IN ('pending', 'finished', 'cancelled')) DEFAULT 'pending',
+  homeResult INT NULL,
+  awayResult INT NULL,
   CONSTRAINT PK_CricketPoolID PRIMARY KEY (id),
   CONSTRAINT FK_PoolMatch FOREIGN KEY (cricketMatchID) REFERENCES cricket_match(id)
 );
