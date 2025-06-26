@@ -11,95 +11,95 @@ export class SportmonksService {
   constructor(
     private readonly httpService: HttpService,
     private readonly cricketTeamService: CricketTeamService
-  ) {}
+  ) { }
 
   // Obtener el ID de la temporada, para no tener que cambiarlo manualmente cada vez que se reinicie la liga
   private async getLatestIPLSeasonId(): Promise<number> {
     const url = `${this.baseUrl}/seasons?api_token=${this.apiToken}&filter[league_id]=1&sort=-id`;
     const response$ = this.httpService.get(url);
     const response = await lastValueFrom(response$);
-    return response.data.data[0].id; 
+    return response.data.data[0].id;
   }
-//Obtener los equipos de la liga ACTUAL
+  //Obtener los equipos de la liga ACTUAL
   async getIPLTEams(): Promise<any> {
     const seasonId = await this.getLatestIPLSeasonId();
     const url = `${this.baseUrl}/seasons/${seasonId}?api_token=${this.apiToken}&include=teams`;
     const response$ = this.httpService.get(url);
     const response = await lastValueFrom(response$);
-return response.data.data.teams;
+    return response.data.data.teams;
 
   }
 
-    // Obtener la posicion por el ID
- private async getPosition(id: number): Promise<any> {
-  const url = `${this.baseUrl}/positions/${id}?api_token=${this.apiToken}`;
-  const response$ = this.httpService.get(url);
-  const response = await lastValueFrom(response$);
-  return response.data; 
-}
+  // Obtener la posicion por el ID
+  private async getPosition(id: number): Promise<any> {
+    const url = `${this.baseUrl}/positions/${id}?api_token=${this.apiToken}`;
+    const response$ = this.httpService.get(url);
+    const response = await lastValueFrom(response$);
+    return response.data;
+  }
 
 
-//Obtener los jugadores por los equipos
-    async getAllPlayersFromStoredTeams(): Promise<any[]> {
-      const teams = await this.cricketTeamService.findAll(); 
-      const allPlayers: any[] = [];
-      const targetSeasonId = await this.getLatestIPLSeasonId();
-    
-      for (const team of teams) {
-        const url = `${this.baseUrl}/teams/${team.id}?api_token=${this.apiToken}&include=squad`;
-        const response$ = this.httpService.get(url);
-    
-        try {
-          const response = await lastValueFrom(response$);
-          const squad = response.data.data.squad || [];
-    
-          for (const player of squad) {
-            if (player.squad?.season_id === targetSeasonId) {
-              const positionId = player.position?.id;
-    
-              let positionName = 'Unknown';
-              if (positionId) {
-                try {
-                  const positionData = await this.getPosition(positionId);
-                  positionName = positionData.data?.name || 'Unknown';
-                } catch (err) {
-                  console.warn(`⚠️ No se pudo obtener la posición del jugador ${player.id}:`, err.message);
-                }
-              }
-    
-              allPlayers.push({
-                ...player,
-                teamId: team.id,
-                positionName: positionName,
-              });
-            }
-          }
-    
-        } catch (error) {
-          console.error(`❌ Error al obtener jugadores del equipo ${team.name} (${team.id}):`, error.message);
-        }
-      }
-    
-      return allPlayers;
-    }
+  //Obtener los jugadores por los equipos
+  async getAllPlayersFromStoredTeams(): Promise<any[]> {
+    const teams = await this.cricketTeamService.findAll();
+    const allPlayers: any[] = [];
+    const targetSeasonId = await this.getLatestIPLSeasonId();
 
-    //Obtener los partidos 
-    async getSeasonMatches(): Promise<any> {
-      const seasonId = await this.getLatestIPLSeasonId();
-      const url = `${this.baseUrl}/fixtures?api_token=${this.apiToken}&filter[season_id]=${seasonId}`;
+    for (const team of teams) {
+      const url = `${this.baseUrl}/teams/${team.id}?api_token=${this.apiToken}&include=squad`;
       const response$ = this.httpService.get(url);
-      const response = await lastValueFrom(response$);
-      return response.data.data;
-  
+
+      try {
+        const response = await lastValueFrom(response$);
+        const squad = response.data.data.squad || [];
+
+        for (const player of squad) {
+          if (player.squad?.season_id === targetSeasonId) {
+            const positionId = player.position?.id;
+
+            let positionName = 'Unknown';
+            if (positionId) {
+              try {
+                const positionData = await this.getPosition(positionId);
+                positionName = positionData.data?.name || 'Unknown';
+              } catch (err) {
+                console.warn(`⚠️ No se pudo obtener la posición del jugador ${player.id}:`, err.message);
+              }
+            }
+
+            allPlayers.push({
+              ...player,
+              teamId: team.id,
+              positionName: positionName,
+            });
+          }
+        }
+
+      } catch (error) {
+        console.error(`❌ Error al obtener jugadores del equipo ${team.name} (${team.id}):`, error.message);
+      }
     }
 
-        //Obtener las actuaciones por fecha
-        async getPerformancesByMatch(id: number): Promise<any> {
-          const seasonId = await this.getLatestIPLSeasonId();
-          const url = `${this.baseUrl}/fixtures/${id}?api_token=${this.apiToken}&filter[season_id]=${seasonId}&include=batting,bowling`;
-          const response$ = this.httpService.get(url);
-          const response = await lastValueFrom(response$);
-          return response.data.data;
-        }
-  
+    return allPlayers;
+  }
+
+  //Obtener los partidos 
+  async getSeasonMatches(includeScore:boolean = false): Promise<any> {
+    const seasonId = await this.getLatestIPLSeasonId();
+    const url = `${this.baseUrl}/fixtures?api_token=${this.apiToken}&filter[season_id]=${seasonId}${includeScore?'&include=scoreboards':''}`;
+    const response$ = this.httpService.get(url);
+    const response = await lastValueFrom(response$);
+    return response.data.data;
+
+  }
+
+  //Obtener las actuaciones por fecha
+  async getPerformancesByMatch(id: number): Promise<any> {
+    const seasonId = await this.getLatestIPLSeasonId();
+    const url = `${this.baseUrl}/fixtures/${id}?api_token=${this.apiToken}&filter[season_id]=${seasonId}&include=batting,bowling`;
+    const response$ = this.httpService.get(url);
+    const response = await lastValueFrom(response$);
+    return response.data.data;
+  }
+
 }

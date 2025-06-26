@@ -21,6 +21,7 @@ import { TaskPlayerHistory } from './sports/modules/job/player-history-cron.serv
 import { SoccerPoolModule } from './sports/modules/soccer/pool/soccer-pool.module';
 import { SoccerSpecialBetModule } from './sports/modules/soccer/specialBets/soccer-special-bet.module';
 import { SoccerPlayerModule } from './sports/modules/soccer/player/soccer-player.module';
+import { TaskPoolService } from './sports/modules/job/pool-cron.service';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { SoccerPlayerModule } from './sports/modules/soccer/player/soccer-player
     TaskMatchService,
     TaskPlayerPerformance,
     TaskPlayerHistory,
+    TaskPoolService
   ],
 })
 export class AppModule {}

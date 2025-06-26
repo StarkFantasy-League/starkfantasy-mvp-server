@@ -9,5 +9,6 @@ import { CricketPool } from 'src/schema';
   imports: [TypeOrmModule.forFeature([CricketPool])],
   controllers: [CricketPoolController],
   providers: [CricketPoolRepository, CricketPoolService],
+  exports: [CricketPoolService],
 })
 export class PoolModule {}
