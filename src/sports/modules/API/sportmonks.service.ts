@@ -84,9 +84,9 @@ export class SportmonksService {
   }
 
   //Obtener los partidos 
-  async getSeasonMatches(): Promise<any> {
+  async getSeasonMatches(includeScore:boolean = false): Promise<any> {
     const seasonId = await this.getLatestIPLSeasonId();
-    const url = `${this.baseUrl}/fixtures?api_token=${this.apiToken}&filter[season_id]=${seasonId}`;
+    const url = `${this.baseUrl}/fixtures?api_token=${this.apiToken}&filter[season_id]=${seasonId}${includeScore?'&include=scoreboards':''}`;
     const response$ = this.httpService.get(url);
     const response = await lastValueFrom(response$);
     return response.data.data;

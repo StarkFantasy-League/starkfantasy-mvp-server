@@ -44,14 +44,19 @@ export class TaskPoolService implements OnModuleInit {
         const pastPools: CricketPool[] = pools.filter(pool => 
             pool.match.matchDate < new Date()
         );
+        // console.log(pastPools);
 
-        const sportmonksMatches = await this.sportmonksService.getSeasonMatches();
+        const sportmonksMatches = await this.sportmonksService.getSeasonMatches(true);
+        const filteredMatches = sportmonksMatches.filter(match => 
+            match.status.toLowerCase() === CricketPoolStatus.Finished
+        );
+        
 
         for (const pool of pastPools) {
             this.logger.log(`Processing pool: ${pool.id}`);
 
             // get the matches for each pool
-            const match = sportmonksMatches.find(m => m.id === pool.cricketMatchId);
+            const match = filteredMatches.find(m => m.id == pool.cricketMatchId);
             if (!match) {
                 this.logger.warn(`Match not found for pool: ${pool.id}`);
                 continue;
@@ -63,16 +68,16 @@ export class TaskPoolService implements OnModuleInit {
             }
 
             this.logger.log(`Found match for pool: ${pool.id} - Match ID: ${match.id}`);
-            this.logger.log(match);
+            
             // check if the matches are finished
-            if (match.status !== CricketPoolStatus.Finished) {
+            if (match.status.toLowerCase() != CricketPoolStatus.Finished) {
                 this.logger.warn(`Match not finished for pool: ${pool.id}`);
                 continue;
             }
             // update the pool results based on the finished matches
             try {
                 const updatedPool = await this.cricketPoolService.updatePoolResults(pool.id, match);
-                this.logger.log(`Updated pool results for pool: ${updatedPool.id}`);
+                this.logger.log(`Updated pool results for pool: ${updatedPool.id} | Home Result: ${updatedPool.homeResult}, Away Result: ${updatedPool.awayResult}`);
             } catch (error) {
                 this.logger.error(`Error updating pool results for pool: ${pool.id}`, error);
             }

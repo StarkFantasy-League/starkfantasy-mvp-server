@@ -49,8 +49,15 @@ export class CricketPoolService {
     }
 
     // Update the pool results based on the match data
-    pool.homeResult = 0;
-    pool.awayResult = 0;
+    const localTeam = match.localteam_id;
+    const visitorTeam = match.visitorteam_id;
+
+    pool.homeResult = match.scoreboards.find(
+      (scoreboard) => scoreboard.team_id === localTeam && scoreboard.type === 'total',
+    )?.total || 0;
+    pool.awayResult = match.scoreboards.find(
+      (scoreboard) => scoreboard.team_id === visitorTeam && scoreboard.type === 'total',
+    )?.total || 0;
     pool.status = CricketPoolStatus.Finished; // Assuming the match is finished
 
     return this.poolRepo.update(pool);
